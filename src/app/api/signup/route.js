@@ -4,7 +4,16 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 export async function POST(request) {
-    const body = await request.json();
+    let body = null;
+    
+    try {
+        body = await request.json()
+    } catch {
+        return NextResponse.json({
+            error: 'Debe enviar un body'
+        }, {status: 400});
+    }
+
     const username = body?.username?.trim();
 
     if (!username) {
