@@ -1,4 +1,6 @@
-FROM docker/whalesay:latest
-LABEL Name=tokennext Version=0.0.1
-RUN apt-get -y update && apt-get install -y fortunes
-CMD ["sh", "-c", "/usr/games/fortune -a | cowsay"]
+FROM node:18.16.0-alpine3.18
+WORKDIR /app
+COPY package*.json .
+RUN npm install
+COPY . .
+CMD ["npm", "run", "dev"]
