@@ -21,16 +21,21 @@ export async function GET(request) {
     }, {status: 400});
   }
 
-  let user = null;
+  const user = await prisma.user.findFirst({
+    where: {
+      username: username
+    }
+  });
+
+  if (!user) {
+    return NextResponse.json({
+        error: `El usuario ${username} no se encuentra registrado`
+    }, {status: 400});
+  }
+  
   let token = null;
   await prisma.$transaction(async (prisma) => {
     //
-    user = await prisma.user.findFirst({
-      where: {
-        username: username
-      }
-    });
-
     const now = new Date();
     const expiredAt = new Date();
     expiredAt.setMinutes(now.getMinutes() + 1);
@@ -57,12 +62,6 @@ export async function GET(request) {
       token = oldToken;
     }    
   });
-
-  if (!user) {
-    return NextResponse.json({
-        error: `El usuario ${username} no se encuentra registrado`
-    }, {status: 400});
-  }
 
   return NextResponse.json({ token: token.value, expiredAt: token.expiredAt, createdAt: token.createdAt });
 }
