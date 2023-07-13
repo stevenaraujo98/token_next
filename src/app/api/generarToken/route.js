@@ -16,5 +16,5 @@ export async function GET(request) {
   const cliente = searchParams.get("cliente");
   console.log(generateNumber());
 
-  return NextResponse.json({ cliente });
+  return NextResponse.json({ cliente, token: generateNumber() });
 }
