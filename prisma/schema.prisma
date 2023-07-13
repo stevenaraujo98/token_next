@@ -12,7 +12,7 @@ datasource db {
 
 model User {
   id       Int     @id @default(autoincrement())
-  username String
+  username String  @unique
   tokens   Token[]
 }
 
@@ -22,6 +22,7 @@ model Token {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   expiredAt DateTime
+  isUsed    Boolean  @default(false)
   userId    Int
   user      User     @relation(fields: [userId], references: [id])
 }
