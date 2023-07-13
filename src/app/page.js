@@ -1,14 +1,45 @@
 "use client"
 import Link from 'next/link';
 import { useForm } from 'react-hook-form';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 export default function Home() {
   const { handleSubmit, register } = useForm({mode: 'onChange'});
 
   const handleClick = (data) => {
-    console.log('click');
-    console.log(data);
+    const { cliente: username } = data;
+
+    fetch("http://localhost:3000/api/signup", {
+      method: "POST",
+      body: JSON.stringify({username}),
+      headers:{
+        'Content-Type': 'application/json'
+      }
+    }).then(res => res.json())
+    .then(res => {
+      console.log('then', res);
+      showToastMessage(res);
+    }).catch(error => {
+      console.error('Error:', error);
+    });
+
   }
+
+  const showToastMessage = (result) => {
+    const type = Object.keys(result)[0];
+
+    if (type === 'error') {
+      toast.error(result[type], {
+        position: toast.POSITION.TOP_RIGHT
+      });
+    }else{
+      toast.success(result[type], {
+          position: toast.POSITION.TOP_RIGHT
+      });
+    }
+  };
+
   return (
     <div>
       {/* justify-between */}
@@ -55,6 +86,8 @@ export default function Home() {
           </Link>
         </p>
       </div>
+
+      <ToastContainer />
     </div>
   )
 }
