@@ -1,0 +1,28 @@
+version: '3.8'
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - .:/app
+      - /app/node_modules
+    ports:
+      - 3000:3000
+    environment:
+      - NODE_ENV=development
+    command: npm run development
+  
+  db:
+    image: postgres:12.15-alpine3.18
+    ports:
+      - ${DB_PORT}:5432
+    environment:
+      - POSTGRES_USER={DB_USERNAME}
+      - POSTGRES_PASSWORD={DB_PASSWORD}
+      - POSTGRES_DB={DB_NAME}
+    volumes:
+      - dbdata:/var/lib/postgresql/dbdata
+  
+  volumes:
+    dbdata:
