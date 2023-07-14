@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
-import { PrismaClient } from '@prisma/client';
-import { ApiError } from '@/utils/errors';
-import { ApiResponse } from '@/utils/responses';
+import { PrismaClient } from "@prisma/client";
+import { ApiError } from "@/utils/errors";
+import { ApiResponse } from "@/utils/responses";
 
 const prisma = new PrismaClient();
 
@@ -20,25 +20,30 @@ export async function GET(request) {
     const username = searchParams.get("cliente")?.trim();
 
     if (!username) {
-      throw new ApiError('Falta el parametro cliente en la consulta', 400);
+      throw new ApiError("Falta el parametro cliente en la consulta", 400);
     }
 
     const user = await prisma.user.findFirst({
       where: {
-        username: username
-      }
+        username: username,
+      },
     });
 
     if (!user) {
-      throw new ApiError(`El usuario ${username} no se encuentra registrado`, 404);
+      throw new ApiError(
+        `El usuario ${username} no se encuentra registrado`,
+        404
+      );
     }
-    
+
     let token = null;
     await prisma.$transaction(async (prisma) => {
-      //
       const now = new Date();
       const expiredAt = new Date();
-      expiredAt.setMinutes(now.getMinutes() + 1);
+      // expiredAt.setMinutes(now.getMinutes() + 1);
+      expiredAt.setSeconds(now.getSeconds() + 59);
+      console.log("now", now);
+      console.log("expiredAt", expiredAt);
 
       const oldToken = await prisma.token.findFirst({
         where: {
@@ -46,32 +51,40 @@ export async function GET(request) {
           isUsed: false,
           expiredAt: {
             gt: now, // expiresAt > now
-          }
-        }
-      })
-      if(!oldToken) {
+          },
+        },
+      });
+      console.log(oldToken);
+      if (!oldToken) {
         const newToken = await prisma.token.create({
           data: {
             userId: user.id,
             value: generateNumber(),
-            expiredAt: expiredAt
-          }
-        })
+            expiredAt: expiredAt,
+          },
+        });
         token = newToken;
       } else {
         token = oldToken;
-      }    
+      }
     });
 
-    apiResponse.data = { token: token.value, expiredAt: token.expiredAt, createdAt: token.createdAt };
-    return NextResponse.json(apiResponse.toJson(), {status: apiResponse.statusCode});
-
+    apiResponse.data = {
+      token: token.value,
+      expiredAt: token.expiredAt,
+      createdAt: token.createdAt,
+    };
+    return NextResponse.json(apiResponse.toJson(), {
+      status: apiResponse.statusCode,
+    });
   } catch (error) {
     if (error instanceof ApiError) {
-      return NextResponse.json(error.toJson(), {status: error.statusCode});
+      return NextResponse.json(error.toJson(), { status: error.statusCode });
     } else {
       const customError = new ApiError();
-      return NextResponse.json(customError.toJson(), {status: customError.statusCode});
+      return NextResponse.json(customError.toJson(), {
+        status: customError.statusCode,
+      });
     }
   }
 }

@@ -11,7 +11,7 @@ services:
       - 3000:3000
     environment:
       - NODE_ENV=development
-    command: sh -c "npx prisma migrate dev && npm run dev"
+    command: sh -c "npx prisma migrate dev && npm run dev --watch"
     depends_on:
       - db
   
