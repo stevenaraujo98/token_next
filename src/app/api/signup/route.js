@@ -1,28 +1,28 @@
 import { NextResponse } from "next/server";
 import { PrismaClient } from '@prisma/client';
+import { ApiError } from '@/utils/errors';
+import { ApiResponse } from '@/utils/responses';
 
 const prisma = new PrismaClient();
 
 export async function POST(request) {
-    let body = null;
-    
     try {
-        body = await request.json()
-    } catch {
-        return NextResponse.json({
-            error: 'Debe enviar un body'
-        }, {status: 400});
-    }
+        let body = null;
 
-    const username = body?.username?.trim();
-
-    if (!username) {
-        return NextResponse.json({
-            error: 'Debe enviar un username'
-        }, {status: 400});
-    }
+        const apiResponse = new ApiResponse(null, 201);
     
-    try {
+        try {
+            body = await request.json()
+        } catch {
+            throw new ApiError('Debe enviar un body', 400);
+        }
+
+        const username = body?.username?.trim();
+
+        if (!username) {
+            throw new ApiError('Debe enviar un username', 400);
+        }
+
         await prisma.$transaction(async (prisma) => {
             await prisma.user.create({
                 data: {
@@ -30,19 +30,21 @@ export async function POST(request) {
                 }
             });
         });
+
+        apiResponse.data = {
+            message: 'Usuario creado correctamente'
+        }
+        return NextResponse.json(apiResponse.toJson(), {status: apiResponse.statusCode});
+
     } catch (error) {
-        if (error?.code === 'P2002') {
-            return NextResponse.json({
-                error: 'El usuario ya existe'
-            }, {status: 400});
+        if (error instanceof ApiError) {
+            return NextResponse.json(error.toJson(), {status: error.statusCode});
         } else {
-            return NextResponse.json({
-                error: 'Ha ocurrido un error inesperado'
-            }, {status: 500});
+            const customError = new ApiError();
+            if (error?.code === 'P2002') {
+                customError.message = 'El usuario ya existe';
+            }
+            return NextResponse.json(customError.toJson(), {status: customError.statusCode});
         }
     }
-
-    return NextResponse.json({
-        message: "Se ha creado el usuario",
-    }, {status: 200});
 }
