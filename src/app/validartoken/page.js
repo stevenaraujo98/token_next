@@ -10,7 +10,7 @@ const Page = () => {
   const handleClick = (data) => {
     const { cliente, token } = data;
 
-    fetch(pathHost + "/api/usartoken?cliente=" + cliente + "&token=" + token)
+    fetch(pathHost + "/api/usarToken?cliente=" + cliente + "&token=" + token)
       .then((res) => res.json())
       .then((res) => {
         console.log("then", res);

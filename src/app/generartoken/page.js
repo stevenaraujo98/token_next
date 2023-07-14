@@ -31,7 +31,7 @@ const Page = () => {
 
   useEffect(() => {
     if (clientSelected.length > 0) {
-      fetch(pathHost + "/api/generartoken?cliente=" + clientSelected)
+      fetch(pathHost + "/api/generarToken?cliente=" + clientSelected)
         .then((res) => res.json())
         .then((res) => {
           console.log("then", res);
