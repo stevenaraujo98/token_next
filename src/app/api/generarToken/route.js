@@ -42,8 +42,6 @@ export async function GET(request) {
       const expiredAt = new Date();
       // expiredAt.setMinutes(now.getMinutes() + 1);
       expiredAt.setSeconds(now.getSeconds() + 59);
-      console.log("now", now);
-      console.log("expiredAt", expiredAt);
 
       const oldToken = await prisma.token.findFirst({
         where: {
@@ -54,7 +52,7 @@ export async function GET(request) {
           },
         },
       });
-      console.log(oldToken);
+      
       if (!oldToken) {
         const newToken = await prisma.token.create({
           data: {
@@ -74,9 +72,11 @@ export async function GET(request) {
       expiredAt: token.expiredAt,
       createdAt: token.createdAt,
     };
+
     return NextResponse.json(apiResponse.toJson(), {
       status: apiResponse.statusCode,
     });
+
   } catch (error) {
     if (error instanceof ApiError) {
       return NextResponse.json(error.toJson(), { status: error.statusCode });

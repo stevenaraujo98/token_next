@@ -15,6 +15,7 @@ export async function GET(request) {
     if (!username) {
       throw new ApiError("Falta el parametro cliente en la consulta", 400);
     }
+
     if (!tokenValue) {
       throw new ApiError("Falta el parametro token en la consulta", 400);
     }
@@ -24,6 +25,7 @@ export async function GET(request) {
         username: username,
       },
     });
+
     if (!user) {
       throw new ApiError(
         `El usuario ${username} no se encuentra registrado`,
@@ -45,6 +47,7 @@ export async function GET(request) {
           },
         },
       });
+
       if (token) {
         await prisma.token.update({
           where: {
@@ -64,6 +67,7 @@ export async function GET(request) {
     apiResponse.data = {
       message: "Se ha validado el token",
     };
+
     return NextResponse.json(apiResponse.toJson(), {
       status: apiResponse.statusCode,
     });
