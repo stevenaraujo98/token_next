@@ -1,30 +1,20 @@
 # App para generar token
 
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+El proyecto cuenta con un archivo ".env.example" el cual debera ser utilizado para generar el archivo ".env".  
+Se utiliza dockerizacion con NextJs tanto para front como para back ya que permite server-side y client-side, tambien se usa prisma como orm y Postgres como motor de base de datos.  
+El ".env" contiene informacion para la conección con la base de datos.
 
-## Getting Started
-
-First, run the development server:
-
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+### Docker
 
 ```bash
 docker compose up -d
 
 docker compose build
+```
 
+### Prisma
+
+```bash
 npx prisma migrate
 ```
 
